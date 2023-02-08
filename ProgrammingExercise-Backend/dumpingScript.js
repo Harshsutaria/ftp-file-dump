@@ -1,7 +1,7 @@
 const dao = require("./dao");
 const xlsx = require("xlsx");
 let file = xlsx.readFile(
-  "/home/vsspl/fileWrite/ProgrammingExercise-Backend/abc.csv"
+  "/home/vsspl/fileWrite/ProgrammingExercise-Backend/xlx/28.csv"
 );
 
 /**
@@ -32,21 +32,22 @@ async function main() {
   const advertise = [9656, 8876, 9518, 9528, 8334];
 
   for (let i of data) {
+    log.info("i is", i);
     if (advertise.includes(i["Advertiser ID"])) {
-      log.info("hey ");
       //dumping the campaign
-      await dao.dumpCampaign(i);
+      // await dao.dumpCampaign(i);
       //dumping the campaign data
       await dao.dumpCampaignLogData(i);
-      //dumping the order
-      await dao.dumpOrders(i);
-      //dumping the order data
-      await dao.dumpOrdersLogData(i);
-      //dumping the creatives
-      await dao.dumpCreative(i);
-      //dumping the creative data
-      await dao.dumpCreativeLogData(i);
+      // //dumping the order
+      // await dao.dumpOrders(i);
+      // //dumping the order data
+      // await dao.dumpOrdersLogData(i);
+      // //dumping the creatives
+      // await dao.dumpCreative(i);
+      // //dumping the creative data
+      // await dao.dumpCreativeLogData(i);
     }
   }
 }
 
+main();
