@@ -37,11 +37,12 @@ async function main() {
       //dumping the campaign
       // await dao.dumpCampaign(i);
       //dumping the campaign data
-      await dao.dumpCampaignLogData(i);
+      // await dao.dumpCampaignLogData(i);
       // //dumping the order
-      // await dao.dumpOrders(i);
+      // await dao.dumpOrder(i);
       // //dumping the order data
-      // await dao.dumpOrdersLogData(i);
+      // await dao.dumpOrderLogData(i);
+      // process.exit(1);
       // //dumping the creatives
       // await dao.dumpCreative(i);
       // //dumping the creative data

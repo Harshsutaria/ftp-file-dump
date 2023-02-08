@@ -18,10 +18,10 @@ async function downloadFile(fileName, writeStream) {
   client.close();
 }
 
-let fileName = `data_files/Yashi_2016-05-29.csv`;
+let fileName = `data_files/Yashi_2016-05-28.csv`;
 const write = fs.createWriteStream(
-  "/home/vsspl/fileWrite/ProgrammingExercise-Backend/abc.csv",
+  "/home/vsspl/fileWrite/ProgrammingExercise-Backend/28.csv",
   "utf-8"
 );
 
-// downloadFile(fileName, write);
+downloadFile(fileName, write);

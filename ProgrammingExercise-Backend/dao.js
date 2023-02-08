@@ -58,6 +58,52 @@ dao.dumpCampaignLogData = async function (body) {
   return status;
 };
 
+dao.dumpOrder = async function (body) {
+  log.info("INSIDE DUMPING ORDER DATA");
+  let status = false;
+
+  //trying to fetch camping data
+  const result = await dao.getOrder(body["Order ID"], body["Campaign ID"]);
+
+  //if data is not present then dump the same
+  if (!result) {
+    status = true;
+    await dao.insertOrder(body);
+  }
+
+  return status;
+};
+
+dao.dumpOrderLogData = async function (body) {
+  log.info("INSIDE DUMPING ORDER LOG  DATA");
+  let status = false;
+
+  //trying to fetch camping data
+  const result = await dao.getOrderLogData(body);
+
+  log.info("result is", result);
+
+  //if data is not present then dump the same
+  if (!result) {
+    status = true;
+    await dao.insertOrUpdateOrderLogData(body);
+  } else {
+    log.info("UPDATING THE RESPONSE");
+
+    //update the body object here
+    body["Impressions"] += result["impression_count"];
+    body["Clicks"] += result["click_count"];
+    body["25% Viewed"] += result["viewed_count_25"];
+    body["50% Viewed"] += result["viewed_count_50"];
+    body["75% Viewed"] += result["viewed_count_75"];
+    body["100% Viewed"] += result["viewed_count_100"];
+    log.info("body is", body);
+    await dao.insertOrUpdateOrderLogData(body);
+  }
+
+  return status;
+};
+
 /**
  * This method is implemented
  * @param  {number} campaignId
@@ -162,6 +208,40 @@ dao.getCampaignLogData = async function (body) {
   return result;
 };
 
+dao.getOrderLogData = async function (body) {
+  log.info("FETCH ORDER LOG DATA METHOD WITH", JSON.stringify(body));
+
+  let result;
+  let data;
+
+  //trying to prepare sql query
+  let sql = `select * from ${constants.PG_YASHI_ORDER_DATA} where order_id = ${
+    body["Order ID"]
+  } and log_date = '${ExcelDateToJSDate(body["Date"])}'`;
+
+  log.info("PREPARING SQL QUERY AS ", sql);
+
+  //trying to create connection with the db
+  await postgres.clientConnect(constants.PG_MASTER_DB);
+
+  //trying to execute query
+  try {
+    data = await postgres.execute(sql);
+  } catch (error) {
+    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
+    throw new Error(error);
+  }
+
+  log.info("result is", data);
+
+  if (Array.isArray(data) && data.length > 0) {
+    result = data[0];
+  }
+
+  log.info("FINAL RESULT IS", JSON.stringify(result));
+  return result;
+};
+
 /**
  * This method is implemented
  * @param  {Object} body
@@ -208,43 +288,15 @@ dao.insertOrUpdateCampaignLogData = async function (body) {
  * @param  {Object}  body
  * @returns {Promise<Object>} userInfo
  */
-dao.dumpOrders = async function (body) {
-  log.info("DUMP CAMPAIGN METHOD WITH", body);
+
+dao.insertOrUpdateOrderLogData = async function (body) {
+  log.info("INSERT OR UPDATE OrdersLogData METHOD WITH", body);
 
   let data;
 
   //trying to prepare sql query
-  let sql = `insert into ${constants.PG_YASHI_ORDER}(campaign_id ,yashi_order_id ,name) values($1 , $2 , $3)`;
-
-  log.info("PREPARING SQL QUERY AS ", sql);
-
-  //trying to create connection with the db
-  await postgres.clientConnect(constants.PG_MASTER_DB);
-
-  //trying to execute query
-  try {
-    data = await postgres.execute(sql, [
-      body["Campaign ID"],
-      body["Order ID"],
-      body["Order Name"],
-    ]);
-  } catch (error) {
-    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
-    throw new Error(error);
-  }
-
-  log.info("result is", data);
-
-  log.info("FINAL RESULT IS", JSON.stringify(data));
-};
-
-dao.dumpOrdersLogData = async function (body) {
-  log.info("DUMP OrdersLogData METHOD WITH", body);
-
-  let data;
-
-  //trying to prepare sql query
-  let sql = `insert into ${constants.PG_YASHI_ORDER_DATA}(order_id ,log_date,impression_count,click_count,viewed_count_25,viewed_count_50,viewed_count_75,viewed_count_100) values($1,$2,$3,$4,$5,$6,$7,$8)`;
+  let sql = `insert into ${constants.PG_YASHI_ORDER_DATA}(order_id ,log_date,impression_count,click_count,viewed_count_25,viewed_count_50,viewed_count_75,viewed_count_100) values($1,$2,$3,$4,$5,$6,$7,$8)
+  on conflict(order_id ,log_date) do update set impression_count=$3 , click_count=$4 ,  viewed_count_25=$5 , viewed_count_50=$6 ,viewed_count_75=$7 , viewed_count_100 = $8`;
 
   log.info("PREPARING SQL QUERY AS ", sql);
 
@@ -328,6 +380,71 @@ dao.dumpCreativeLogData = async function (body) {
       body["50% Viewed"],
       body["75% Viewed"],
       body["100% Viewed"],
+    ]);
+  } catch (error) {
+    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
+    throw new Error(error);
+  }
+
+  log.info("result is", data);
+
+  log.info("FINAL RESULT IS", JSON.stringify(data));
+};
+
+/**
+ * This method is implemented
+ * @param  {number} orderId
+ * @param  {number} campaignId
+ * @returns {Promise<Object>}
+ */
+dao.getOrder = async function (orderId, campaignId) {
+  log.info("FETCH ORDER METHOD WITH", orderId);
+
+  let data;
+  let result;
+
+  //trying to prepare sql query
+  let sql = `select * from ${constants.PG_YASHI_ORDER} where yashi_order_id = ${orderId} and campaign_id = ${campaignId}`;
+
+  log.info("PREPARING SQL QUERY AS ", sql);
+
+  //trying to create connection with the db
+  await postgres.clientConnect(constants.PG_MASTER_DB);
+
+  //trying to execute query
+  try {
+    data = await postgres.execute(sql);
+  } catch (error) {
+    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
+    throw new Error(error);
+  }
+
+  if (Array.isArray(data) && data.length > 0) {
+    result = data[0];
+  }
+
+  return result;
+};
+
+dao.insertOrder = async function (body) {
+  log.info("DUMP ORDER METHOD WITH", body);
+
+  let data;
+
+  //trying to prepare sql query
+  let sql = `insert into ${constants.PG_YASHI_ORDER}(campaign_id ,yashi_order_id ,name) values($1 , $2 , $3)`;
+
+  log.info("PREPARING SQL QUERY AS ", sql);
+
+  //trying to create connection with the db
+  await postgres.clientConnect(constants.PG_MASTER_DB);
+
+  //trying to execute query
+  try {
+    data = await postgres.execute(sql, [
+      body["Campaign ID"],
+      body["Order ID"],
+      body["Order Name"],
     ]);
   } catch (error) {
     log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
