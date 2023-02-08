@@ -35,18 +35,18 @@ async function main() {
     log.info("i is", i);
     if (advertise.includes(i["Advertiser ID"])) {
       //dumping the campaign
-      // await dao.dumpCampaign(i);
+      await dao.dumpCampaign(i);
       //dumping the campaign data
-      // await dao.dumpCampaignLogData(i);
+      await dao.dumpCampaignLogData(i);
       // //dumping the order
-      // await dao.dumpOrder(i);
+      await dao.dumpOrder(i);
       // //dumping the order data
-      // await dao.dumpOrderLogData(i);
-      // process.exit(1);
+      await dao.dumpOrderLogData(i);
       // //dumping the creatives
-      // await dao.dumpCreative(i);
+      await dao.dumpCreative(i);
       // //dumping the creative data
-      // await dao.dumpCreativeLogData(i);
+      await dao.dumpCreativeLogData(i);
+      // process.exit(1);
     }
   }
 }

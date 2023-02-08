@@ -104,6 +104,52 @@ dao.dumpOrderLogData = async function (body) {
   return status;
 };
 
+dao.dumpCreative = async function (body) {
+  log.info("INSIDE DUMPING CAMPAIGN DATA");
+  let status = false;
+
+  //trying to fetch camping data
+  const result = await dao.getCreative(body["Creative ID"], body["Order ID"]);
+
+  //if data is not present then dump the same
+  if (!result) {
+    status = true;
+    await dao.insertCreative(body);
+  }
+
+  return status;
+};
+
+dao.dumpCreativeLogData = async function (body) {
+  log.info("INSIDE DUMPING CREATIVE LOG  DATA");
+  let status = false;
+
+  //trying to fetch camping data
+  const result = await dao.getCreativeLogData(body);
+
+  log.info("result is", result);
+
+  //if data is not present then dump the same
+  if (!result) {
+    status = true;
+    await dao.insertOrUpdateCreativeLogData(body);
+  } else {
+    log.info("UPDATING THE RESPONSE");
+
+    //update the body object here
+    body["Impressions"] += result["impression_count"];
+    body["Clicks"] += result["click_count"];
+    body["25% Viewed"] += result["viewed_count_25"];
+    body["50% Viewed"] += result["viewed_count_50"];
+    body["75% Viewed"] += result["viewed_count_75"];
+    body["100% Viewed"] += result["viewed_count_100"];
+    log.info("body is", body);
+    await dao.insertOrUpdateCreativeLogData(body);
+  }
+
+  return status;
+};
+
 /**
  * This method is implemented
  * @param  {number} campaignId
@@ -325,8 +371,8 @@ dao.insertOrUpdateOrderLogData = async function (body) {
   log.info("FINAL RESULT IS", JSON.stringify(data));
 };
 
-dao.dumpCreative = async function (body) {
-  log.info("DUMP CREATIVE METHOD WITH", body);
+dao.insertCreative = async function (body) {
+  log.info("INSERT CREATIVE METHOD WITH", body);
 
   let data;
 
@@ -356,7 +402,7 @@ dao.dumpCreative = async function (body) {
   log.info("FINAL RESULT IS", JSON.stringify(data));
 };
 
-dao.dumpCreativeLogData = async function (body) {
+dao.insertCreativeLogData = async function (body) {
   log.info("DUMP CreativeLogData METHOD WITH", body);
 
   let data;
@@ -445,6 +491,112 @@ dao.insertOrder = async function (body) {
       body["Campaign ID"],
       body["Order ID"],
       body["Order Name"],
+    ]);
+  } catch (error) {
+    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
+    throw new Error(error);
+  }
+
+  log.info("result is", data);
+
+  log.info("FINAL RESULT IS", JSON.stringify(data));
+};
+
+/**
+ * This method is implemented
+ * @param  {number} creativeId
+ * @returns {Promise<Object>} userInfo
+ */
+dao.getCreative = async function (creativeId, orderId) {
+  log.info("FETCH CREATIVE METHOD WITH", creativeId);
+
+  let data;
+  let result;
+
+  //trying to prepare sql query
+  let sql = `select * from ${constants.PG_YASHI_CREATIVE} where yashi_creative_id = ${creativeId} and order_id = ${orderId}`;
+
+  log.info("PREPARING SQL QUERY AS ", sql);
+
+  //trying to create connection with the db
+  await postgres.clientConnect(constants.PG_MASTER_DB);
+
+  //trying to execute query
+  try {
+    data = await postgres.execute(sql);
+  } catch (error) {
+    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
+    throw new Error(error);
+  }
+
+  if (Array.isArray(data) && data.length > 0) {
+    result = data[0];
+  }
+
+  return result;
+};
+
+dao.getCreativeLogData = async function (body) {
+  log.info("FETCH CREATIVE LOG DATA METHOD WITH", JSON.stringify(body));
+
+  let result;
+  let data;
+
+  //trying to prepare sql query
+  let sql = `select * from ${
+    constants.PG_YASHI_CREATIVE_DATA
+  } where creative_id = ${
+    body["Creative ID"]
+  } and log_date = '${ExcelDateToJSDate(body["Date"])}'`;
+
+  log.info("PREPARING SQL QUERY AS ", sql);
+
+  //trying to create connection with the db
+  await postgres.clientConnect(constants.PG_MASTER_DB);
+
+  //trying to execute query
+  try {
+    data = await postgres.execute(sql);
+  } catch (error) {
+    log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
+    throw new Error(error);
+  }
+
+  log.info("result is", data);
+
+  if (Array.isArray(data) && data.length > 0) {
+    result = data[0];
+  }
+
+  log.info("FINAL RESULT IS", JSON.stringify(result));
+  return result;
+};
+
+dao.insertOrUpdateCreativeLogData = async function (body) {
+  log.info("INSERT OR UPDATE creativeLogData METHOD WITH", body);
+
+  let data;
+
+  //trying to prepare sql query
+  let sql = `insert into ${constants.PG_YASHI_CREATIVE_DATA}(creative_id ,log_date,impression_count,click_count,viewed_count_25,viewed_count_50,viewed_count_75,viewed_count_100) values($1,$2,$3,$4,$5,$6,$7,$8)
+  on conflict(creative_id ,log_date) do update set impression_count=$3 , click_count=$4 ,  viewed_count_25=$5 , viewed_count_50=$6 ,viewed_count_75=$7 , viewed_count_100 = $8`;
+
+  log.info("PREPARING SQL QUERY AS ", sql);
+
+  //trying to create connection with the db
+  await postgres.clientConnect(constants.PG_MASTER_DB);
+
+  //trying to execute query
+  try {
+    data = await postgres.execute(sql, [
+      body["Creative ID"],
+      ExcelDateToJSDate(body["Date"]),
+      body["Impressions"],
+      body["Clicks"],
+      body["25% Viewed"],
+      body["50% Viewed"],
+      body["75% Viewed"],
+      body["100% Viewed"],
     ]);
   } catch (error) {
     log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
