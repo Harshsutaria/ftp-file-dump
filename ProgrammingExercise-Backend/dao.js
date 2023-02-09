@@ -8,10 +8,15 @@ const log = {
 };
 
 /**
- * Container for auth DAO.
+ * Container for DAO.
  */
 const dao = {};
 
+/**
+ * This method is implemented in-order to dump campaign data
+ * @param {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.dumpCampaign = async function (body) {
   log.info("INSIDE DUMPING CAMPAIGN DATA");
   let status = false;
@@ -28,6 +33,11 @@ dao.dumpCampaign = async function (body) {
   return status;
 };
 
+/**
+ * This method is implemented in-order to dump campaign log data
+ * @param {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.dumpCampaignLogData = async function (body) {
   log.info("INSIDE DUMPING CAMPAIGN LOG  DATA");
   let status = false;
@@ -58,6 +68,11 @@ dao.dumpCampaignLogData = async function (body) {
   return status;
 };
 
+/**
+ * This method is implemented in-order to dump order data
+ * @param {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.dumpOrder = async function (body) {
   log.info("INSIDE DUMPING ORDER DATA");
   let status = false;
@@ -74,6 +89,11 @@ dao.dumpOrder = async function (body) {
   return status;
 };
 
+/**
+ * This method is implemented in-order to dump order log data
+ * @param {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.dumpOrderLogData = async function (body) {
   log.info("INSIDE DUMPING ORDER LOG  DATA");
   let status = false;
@@ -104,6 +124,11 @@ dao.dumpOrderLogData = async function (body) {
   return status;
 };
 
+/**
+ * This method is implemented in-order to dump creative data
+ * @param {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.dumpCreative = async function (body) {
   log.info("INSIDE DUMPING CAMPAIGN DATA");
   let status = false;
@@ -120,6 +145,11 @@ dao.dumpCreative = async function (body) {
   return status;
 };
 
+/**
+ * This method is implemented in-order to dump creative log data
+ * @param {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.dumpCreativeLogData = async function (body) {
   log.info("INSIDE DUMPING CREATIVE LOG  DATA");
   let status = false;
@@ -151,9 +181,9 @@ dao.dumpCreativeLogData = async function (body) {
 };
 
 /**
- * This method is implemented
+ * This method is  implemented in-order to fetch campaign data based on id
  * @param  {number} campaignId
- * @returns {Promise<Object>} userInfo
+ * @returns {Promise<Object>} campaignData
  */
 dao.getCampaign = async function (campaignId) {
   log.info("FETCH CAMPAIGN METHOD WITH", campaignId);
@@ -185,9 +215,9 @@ dao.getCampaign = async function (campaignId) {
 };
 
 /**
- * This method is implemented
+ * This method is  implemented in-order to insert campaign data
  * @param  {Object} body
- * @returns {Promise<Object>} userInfo
+ * @returns {Promise<boolean>} status
  */
 dao.insertCampaign = async function (body) {
   log.info("DUMP CAMPAIGN METHOD WITH", body);
@@ -215,11 +245,14 @@ dao.insertCampaign = async function (body) {
     throw new Error(error);
   }
 
-  log.info("result is", data);
-
-  log.info("FINAL RESULT IS", JSON.stringify(data));
+  return data ? true : false;
 };
 
+/**
+ * This method is  implemented in-order to fetch campaign log data
+ * @param  {Object} body
+ * @returns {Promise<Object>} campaignLogData
+ */
 dao.getCampaignLogData = async function (body) {
   log.info("FETCH CAMPAIGN LOG DATA METHOD WITH", JSON.stringify(body));
 
@@ -254,6 +287,11 @@ dao.getCampaignLogData = async function (body) {
   return result;
 };
 
+/**
+ * This method is  implemented in-order to fetch campaign data based on id
+ * @param  {Object} body
+ * @returns {Promise<Object>} campaignLogData
+ */
 dao.getOrderLogData = async function (body) {
   log.info("FETCH ORDER LOG DATA METHOD WITH", JSON.stringify(body));
 
@@ -284,14 +322,13 @@ dao.getOrderLogData = async function (body) {
     result = data[0];
   }
 
-  log.info("FINAL RESULT IS", JSON.stringify(result));
   return result;
 };
 
 /**
- * This method is implemented
+ * This method is  implemented in-order to insert/update campaign log data
  * @param  {Object} body
- * @returns {Promise<Object>} userInfo
+ * @returns {Promise<boolean>} status
  */
 dao.insertOrUpdateCampaignLogData = async function (body) {
   log.info("INSERT CampaignLogData METHOD WITH", body);
@@ -326,15 +363,14 @@ dao.insertOrUpdateCampaignLogData = async function (body) {
 
   log.info("result is", data);
 
-  log.info("FINAL RESULT IS", JSON.stringify(data));
+  return data ? true : false;
 };
 
 /**
- * This method is implemented in-order to insert some base user Information
- * @param  {Object}  body
- * @returns {Promise<Object>} userInfo
+ * This method is  implemented in-order to insert/update order log data
+ * @param  {Object} body
+ * @returns {Promise<boolean>} status
  */
-
 dao.insertOrUpdateOrderLogData = async function (body) {
   log.info("INSERT OR UPDATE OrdersLogData METHOD WITH", body);
 
@@ -366,11 +402,14 @@ dao.insertOrUpdateOrderLogData = async function (body) {
     throw new Error(error);
   }
 
-  log.info("result is", data);
-
-  log.info("FINAL RESULT IS", JSON.stringify(data));
+  return data ? true : false;
 };
 
+/**
+ * This method is  implemented in-order to insert creative data
+ * @param  {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.insertCreative = async function (body) {
   log.info("INSERT CREATIVE METHOD WITH", body);
 
@@ -397,13 +436,16 @@ dao.insertCreative = async function (body) {
     throw new Error(error);
   }
 
-  log.info("result is", data);
-
-  log.info("FINAL RESULT IS", JSON.stringify(data));
+  return data ? true : false;
 };
 
+/**
+ * This method is  implemented in-order to insert/update creative log data
+ * @param  {Object} body
+ * @returns {Promise<boolean>} status
+ */
 dao.insertCreativeLogData = async function (body) {
-  log.info("DUMP CreativeLogData METHOD WITH", body);
+  log.info("INSERT CreativeLogData METHOD WITH", body);
 
   let data;
 
@@ -432,16 +474,14 @@ dao.insertCreativeLogData = async function (body) {
     throw new Error(error);
   }
 
-  log.info("result is", data);
-
-  log.info("FINAL RESULT IS", JSON.stringify(data));
+  return data ? true : false;
 };
 
 /**
- * This method is implemented
+ * This method is implemented to fetch orders based on orderId , campaignId
  * @param  {number} orderId
  * @param  {number} campaignId
- * @returns {Promise<Object>}
+ * @returns {Promise<Object>} order
  */
 dao.getOrder = async function (orderId, campaignId) {
   log.info("FETCH ORDER METHOD WITH", orderId);
@@ -472,8 +512,13 @@ dao.getOrder = async function (orderId, campaignId) {
   return result;
 };
 
+/**
+ * This method is implemented in-order to insert order
+ * @param  {Object} body
+ * @returns {Promise<boolean>} order
+ */
 dao.insertOrder = async function (body) {
-  log.info("DUMP ORDER METHOD WITH", body);
+  log.info("INSERT ORDER METHOD WITH", body);
 
   let data;
 
@@ -497,15 +542,14 @@ dao.insertOrder = async function (body) {
     throw new Error(error);
   }
 
-  log.info("result is", data);
-
-  log.info("FINAL RESULT IS", JSON.stringify(data));
+  return data ? true : false;
 };
 
 /**
- * This method is implemented
+ * This method is implemented to fetch orders based on orderId , campaignId
  * @param  {number} creativeId
- * @returns {Promise<Object>} userInfo
+ * @param  {number} orderId
+ * @returns {Promise<Object>} creative
  */
 dao.getCreative = async function (creativeId, orderId) {
   log.info("FETCH CREATIVE METHOD WITH", creativeId);
@@ -536,6 +580,11 @@ dao.getCreative = async function (creativeId, orderId) {
   return result;
 };
 
+/**
+ * This method is implemented to fetch creative log data
+ * @param  {Object} body
+ * @returns {Promise<Object>} creativeLogData
+ */
 dao.getCreativeLogData = async function (body) {
   log.info("FETCH CREATIVE LOG DATA METHOD WITH", JSON.stringify(body));
 
@@ -572,6 +621,11 @@ dao.getCreativeLogData = async function (body) {
   return result;
 };
 
+/**
+ * This method is implemented in-order to insert/update creativeLogData
+ * @param  {Object} body
+ * @returns {Promise<Object>} creative
+ */
 dao.insertOrUpdateCreativeLogData = async function (body) {
   log.info("INSERT OR UPDATE creativeLogData METHOD WITH", body);
 
@@ -608,6 +662,11 @@ dao.insertOrUpdateCreativeLogData = async function (body) {
   log.info("FINAL RESULT IS", JSON.stringify(data));
 };
 
+/**
+ * This function is implemented in-order to return iso date
+ * @param {number} date
+ * @returns {string} date
+ */
 function ExcelDateToJSDate(date) {
   return new Date(Math.round((date - 25569) * 86400 * 1000)).toISOString();
 }
