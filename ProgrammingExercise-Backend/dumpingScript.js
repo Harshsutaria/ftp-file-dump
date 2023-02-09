@@ -44,29 +44,28 @@ function readFromCsv() {
 
 /**
  * This method is implemented in-order to dump data from the csv files into respective tables
+ * for various entities like campaign , order , creative
  */
 async function main() {
-  log.info("inside main method");
+  log.info("INSIDE MAIN METHOD");
+
+  //fetching data from the csv file
   const data = readFromCsv();
 
-  console.log("DATA IS", data.length);
-
   for (let i of data) {
-    log.info("i is", i);
-    //dumping the campaign
+    // dumping the campaign
     await dao.dumpCampaign(i);
     //dumping the campaign data
     await dao.dumpCampaignLogData(i);
-    // //dumping the order
+    //dumping the order
     await dao.dumpOrder(i);
-    // //dumping the order data
+    //dumping the order data
     await dao.dumpOrderLogData(i);
-    // //dumping the creatives
+    //dumping the creatives
     await dao.dumpCreative(i);
-    // //dumping the creative data
+    // dumping the creative data
     await dao.dumpCreativeLogData(i);
   }
 }
 
 main();
-// readFromCsv();

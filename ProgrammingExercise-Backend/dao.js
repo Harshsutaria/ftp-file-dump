@@ -53,15 +53,9 @@ dao.dumpCampaignLogData = async function (body) {
     await dao.insertOrUpdateCampaignLogData(body);
   } else {
     log.info("UPDATING THE RESPONSE");
-
+    status = true;
     //update the body object here
-    body["Impressions"] += result["impression_count"];
-    body["Clicks"] += result["click_count"];
-    body["25% Viewed"] += result["viewed_count_25"];
-    body["50% Viewed"] += result["viewed_count_50"];
-    body["75% Viewed"] += result["viewed_count_75"];
-    body["100% Viewed"] += result["viewed_count_100"];
-    log.info("body is", body);
+    body = prepPayload(body, result);
     await dao.insertOrUpdateCampaignLogData(body);
   }
 
@@ -109,15 +103,9 @@ dao.dumpOrderLogData = async function (body) {
     await dao.insertOrUpdateOrderLogData(body);
   } else {
     log.info("UPDATING THE RESPONSE");
-
+    status = true;
     //update the body object here
-    body["Impressions"] += result["impression_count"];
-    body["Clicks"] += result["click_count"];
-    body["25% Viewed"] += result["viewed_count_25"];
-    body["50% Viewed"] += result["viewed_count_50"];
-    body["75% Viewed"] += result["viewed_count_75"];
-    body["100% Viewed"] += result["viewed_count_100"];
-    log.info("body is", body);
+    body = prepPayload(body, result);
     await dao.insertOrUpdateOrderLogData(body);
   }
 
@@ -165,15 +153,9 @@ dao.dumpCreativeLogData = async function (body) {
     await dao.insertOrUpdateCreativeLogData(body);
   } else {
     log.info("UPDATING THE RESPONSE");
-
+    status = true;
     //update the body object here
-    body["Impressions"] += result["impression_count"];
-    body["Clicks"] += result["click_count"];
-    body["25% Viewed"] += result["viewed_count_25"];
-    body["50% Viewed"] += result["viewed_count_50"];
-    body["75% Viewed"] += result["viewed_count_75"];
-    body["100% Viewed"] += result["viewed_count_100"];
-    log.info("body is", body);
+    body = prepPayload(body, result);
     await dao.insertOrUpdateCreativeLogData(body);
   }
 
@@ -661,6 +643,24 @@ dao.insertOrUpdateCreativeLogData = async function (body) {
 
   log.info("FINAL RESULT IS", JSON.stringify(data));
 };
+
+/**
+ * This method is implemented in-order to update views/stats based on the existing record
+ * @param  {Object} body
+ * @param  {Object} result
+ * @returns {Promise<Object>} body
+ */
+
+function prepPayload(body, result) {
+  body["Impressions"] += result["impression_count"];
+  body["Clicks"] += result["click_count"];
+  body["25% Viewed"] += result["viewed_count_25"];
+  body["50% Viewed"] += result["viewed_count_50"];
+  body["75% Viewed"] += result["viewed_count_75"];
+  body["100% Viewed"] += result["viewed_count_100"];
+  log.info("body is", body);
+  return body;
+}
 
 /**
  * This function is implemented in-order to return iso date
