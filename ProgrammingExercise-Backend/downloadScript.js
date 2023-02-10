@@ -3,6 +3,7 @@ const fs = require("fs");
 
 async function downloadFile(fileName) {
   console.log(fileName);
+  let destinationDirectory = `/home/vsspl/fileWrite/ProgrammingExercise-Backend/xlx/`;
   const client = new ftp.Client();
   try {
     await client.access({
@@ -10,6 +11,14 @@ async function downloadFile(fileName) {
       user: "ftp_integration_test",
       password: "6k0Sb#EXT6jw",
     });
+
+    //if the directory doesn`t exists then prepare the same
+    if (!fs.existsSync(destinationDirectory)) {
+      fs.mkdir(destinationDirectory, (err) => {
+        if (err) console.log("error occured");
+      });
+    }
+
     let result = await client.list(fileName);
     result = result.map((x) => x.name);
 
