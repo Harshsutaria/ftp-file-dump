@@ -1,7 +1,7 @@
 const ftp = require("basic-ftp");
 const fs = require("fs");
 
-async function downloadFile(fileName, writeStream) {
+async function downloadFile(fileName) {
   console.log(fileName);
   const client = new ftp.Client();
   try {
