@@ -1,6 +1,6 @@
 const dao = require("./dao");
 const xlsx = require("xlsx");
-const dir = `/home/vsspl/fileWrite/ProgrammingExercise-Backend/xlx/`;
+const dir = `${__dirname}/xlx/`;
 const fs = require("fs");
 
 /**
@@ -59,13 +59,15 @@ async function main() {
     await dao.dumpCampaignLogData(i);
     //dumping the order
     await dao.dumpOrder(i);
-    //dumping the order data
+    // dumping the order data
     await dao.dumpOrderLogData(i);
     //dumping the creatives
     await dao.dumpCreative(i);
-    // dumping the creative data
+    // // dumping the creative data
     await dao.dumpCreativeLogData(i);
   }
+
+  log.info("DATA DUMPED SUCCESSFULLY");
 }
 
-// main();
+//main();

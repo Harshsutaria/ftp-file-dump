@@ -18,7 +18,11 @@ const dao = {};
  * @returns {Promise<boolean>} status
  */
 dao.dumpCampaign = async function (body) {
-  log.info("INSIDE DUMPING CAMPAIGN DATA");
+  log.info(
+    "INSIDE DUMPING CAMPAIGN DATA",
+    JSON.stringify(body),
+    body["Campaign ID"]
+  );
   let status = false;
 
   //trying to fetch camping data
@@ -55,8 +59,8 @@ dao.dumpCampaignLogData = async function (body) {
     log.info("UPDATING THE RESPONSE");
     status = true;
     //update the body object here
-    body = prepPayload(body, result);
-    await dao.insertOrUpdateCampaignLogData(body);
+    const updateBody = prepPayload(body, result);
+    await dao.insertOrUpdateCampaignLogData(updateBody);
   }
 
   return status;
@@ -105,8 +109,8 @@ dao.dumpOrderLogData = async function (body) {
     log.info("UPDATING THE RESPONSE");
     status = true;
     //update the body object here
-    body = prepPayload(body, result);
-    await dao.insertOrUpdateOrderLogData(body);
+    const updateBody = prepPayload(body, result);
+    await dao.insertOrUpdateOrderLogData(updateBody);
   }
 
   return status;
@@ -155,8 +159,8 @@ dao.dumpCreativeLogData = async function (body) {
     log.info("UPDATING THE RESPONSE");
     status = true;
     //update the body object here
-    body = prepPayload(body, result);
-    await dao.insertOrUpdateCreativeLogData(body);
+    const updateBody = prepPayload(body, result);
+    await dao.insertOrUpdateCreativeLogData(updateBody);
   }
 
   return status;
@@ -275,7 +279,7 @@ dao.getCampaignLogData = async function (body) {
  * @returns {Promise<Object>} campaignLogData
  */
 dao.getOrderLogData = async function (body) {
-  log.info("FETCH ORDER LOG DATA METHOD WITH", JSON.stringify(body));
+  log.info("FETCH ORDER LOG DATA METHOD WITH");
 
   let result;
   let data;
@@ -297,8 +301,6 @@ dao.getOrderLogData = async function (body) {
     log.info("GETTING ERROR WHILE EXECUTING PG QUERY", error);
     throw new Error(error);
   }
-
-  log.info("result is", data);
 
   if (Array.isArray(data) && data.length > 0) {
     result = data[0];
@@ -354,7 +356,7 @@ dao.insertOrUpdateCampaignLogData = async function (body) {
  * @returns {Promise<boolean>} status
  */
 dao.insertOrUpdateOrderLogData = async function (body) {
-  log.info("INSERT OR UPDATE OrdersLogData METHOD WITH", body);
+  log.info("INSERT OR UPDATE OrdersLogData METHOD WITH", body["Impressions"]);
 
   let data;
 
@@ -362,7 +364,7 @@ dao.insertOrUpdateOrderLogData = async function (body) {
   let sql = `insert into ${constants.PG_YASHI_ORDER_DATA}(order_id ,log_date,impression_count,click_count,viewed_count_25,viewed_count_50,viewed_count_75,viewed_count_100) values($1,$2,$3,$4,$5,$6,$7,$8)
   on conflict(order_id ,log_date) do update set impression_count=$3 , click_count=$4 ,  viewed_count_25=$5 , viewed_count_50=$6 ,viewed_count_75=$7 , viewed_count_100 = $8`;
 
-  log.info("PREPARING SQL QUERY AS ", sql);
+  // log.info("PREPARING SQL QUERY AS ", sql);
 
   //trying to create connection with the db
   await postgres.clientConnect(constants.PG_MASTER_DB);
@@ -652,14 +654,16 @@ dao.insertOrUpdateCreativeLogData = async function (body) {
  */
 
 function prepPayload(body, result) {
-  body["Impressions"] += result["impression_count"];
-  body["Clicks"] += result["click_count"];
-  body["25% Viewed"] += result["viewed_count_25"];
-  body["50% Viewed"] += result["viewed_count_50"];
-  body["75% Viewed"] += result["viewed_count_75"];
-  body["100% Viewed"] += result["viewed_count_100"];
-  log.info("body is", body);
-  return body;
+  const updatedBody = JSON.parse(JSON.stringify(body));
+
+  updatedBody["Impressions"] += result["impression_count"];
+  updatedBody["Clicks"] += result["click_count"];
+  updatedBody["25% Viewed"] += result["viewed_count_25"];
+  updatedBody["50% Viewed"] += result["viewed_count_50"];
+  updatedBody["75% Viewed"] += result["viewed_count_75"];
+  updatedBody["100% Viewed"] += result["viewed_count_100"];
+  log.info("updatedBody is", updatedBody);
+  return updatedBody;
 }
 
 /**

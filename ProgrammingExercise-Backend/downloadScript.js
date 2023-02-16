@@ -1,9 +1,11 @@
 const ftp = require("basic-ftp");
 const fs = require("fs");
 
+const fileName = `data_files/`;
+
 async function downloadFile(fileName) {
   console.log(fileName);
-  let destinationDirectory = `/home/vsspl/fileWrite/ProgrammingExercise-Backend/xlx/`;
+  let destinationDirectory = `${__dirname}/xlx/`;
   const client = new ftp.Client();
   try {
     await client.access({
@@ -22,11 +24,13 @@ async function downloadFile(fileName) {
     let result = await client.list(fileName);
     result = result.map((x) => x.name);
 
+    //filtering out the april and Advertisers file
+    result = result.filter(
+      (x) => !x.includes("-04") && !x.includes("Advertisers")
+    );
+
     for (let i of result) {
-      const write = fs.createWriteStream(
-        `/home/vsspl/fileWrite/ProgrammingExercise-Backend/xlx/${i}`,
-        "utf-8"
-      );
+      const write = fs.createWriteStream(`${__dirname}/xlx/${i}`, "utf-8");
       await client.downloadTo(write, `${fileName}/${i}`);
     }
   } catch (err) {
@@ -34,7 +38,5 @@ async function downloadFile(fileName) {
   }
   client.close();
 }
-
-// let fileName = `data_files/`;
 
 // downloadFile(fileName);
